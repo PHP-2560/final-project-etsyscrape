@@ -1,0 +1,20 @@
+---
+title: "Drinking Age leaflet"
+author: "Nana Boame"
+date: "December 10, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("leaflet")
+library(leaflet)
+
+age <- readRDS("C:/Users/akosu/Dropbox/Brown/1. Fall 2018/PHP 2560 - Statistical Computing with R/ShinyApp/Final-Project-ShinyApp/min_age_table.rds")
+
+
+```
+
