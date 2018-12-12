@@ -28,14 +28,16 @@ ui <- navbarPage(strong("TravelBeeR"),
                         uiOutput("styleOutput"),
                         radioButtons("pointDisplay", "Show results as: ", 
                                      c("Points", "Clusters"), selected = "Clusters")
-                        ),
-                        mainPanel(
-                          leafletOutput("selected_map", height=625),
-                          dataTableOutput("beer_locations")
-                      )
-                    )
-           )
-)
+                      ),
+                      mainPanel(
+                        tabsetPanel(
+                          tabPanel(title = "Map!", 
+                                   leafletOutput("selected_map")
+                          ), 
+                          tabPanel(title = "Top Destinations!",
+                                   dataTableOutput("beer_locations"))
+                        )
+                      ))))
 
 
 server <- function(input, output) {
