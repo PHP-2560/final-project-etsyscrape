@@ -9,12 +9,50 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+```{r}
+# clean age data
+age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table.rds")
+
+# rename columns
+names(age)
+colnames(age) <- c("Country", "On Premise", "Off Premise")
+
+# delete first row of data as it is a duplicate of column names
+age <- age[-1,]
+
+# within each column, remove * [ ]
+age$`On Premise` <- gsub("[*]", "", age$`On Premise`)
+age$`Off Premise` <- gsub("[*]", "", age$`Off Premise`)
+
+min_age_table_clean <- saveRDS("age", "C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table_clean.rds")
+```
+
+
 ```{r}
 install.packages("leaflet")
 library(leaflet)
 
-age <- readRDS("C:/Users/akosu/Dropbox/Brown/1. Fall 2018/PHP 2560 - Statistical Computing with R/ShinyApp/Final-Project-ShinyApp/min_age_table.rds")
 
 
+age_map <- leaflet() %>%
+  addTiles() 
+
+```
+
+#fit the above into the below format
+
+ui <- navbarPage(strong("TravelBeeR"),
+           tabPanel("Legal Drinking Age",
+                    sidebarLayout(
+                      sidebarPanel(
+                        dateInput("birthdate", "Enter your date of birth (yyyy-mm-dd): ")
+                      ),
+                      mainPanel(
+                        leafletOutput("age_map"),
+                        dataTableOutput("age_table")
+                      )
+                    )
+           ),
 ```
 
