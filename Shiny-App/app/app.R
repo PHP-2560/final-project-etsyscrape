@@ -3,7 +3,7 @@ library(dplyr)
 library(markdown)
 library(leaflet)
 
-#complete_data <- readRDS("beer_data_loc_all.rds")
+complete_data <- readRDS("beer_data_loc_all.rds")
 
 complete_data$UT_sub_style <- as.character(complete_data$UT_sub_style)
 
