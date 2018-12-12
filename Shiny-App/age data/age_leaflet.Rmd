@@ -29,11 +29,10 @@ min_age_table_clean <- saveRDS("age", "C:/Users/akosu/Desktop/final-project-etsy
 ```
 
 
+
 ```{r}
 install.packages("leaflet")
 library(leaflet)
-
-
 
 age_map <- leaflet() %>%
   addTiles() 
