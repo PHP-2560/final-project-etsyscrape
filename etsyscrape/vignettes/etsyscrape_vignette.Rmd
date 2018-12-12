@@ -1,0 +1,185 @@
+---
+title: "etsyscrape package"
+author: "Meagan McCardle & Nana Boame"
+date: "December 5, 2018"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{etsyscrape_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Etsy
+
+“Etsy is the global marketplace for unique and creative goods. It’s home to a universe of special, extraordinary items, from unique handcrafted pieces to vintage treasures.” – Etsy.com
+
+To view Etsy, visit <http://etsy.com>.
+
+This package allows the user to scrape and explore the information returned by an Etsy online search. 
+
+The etsyscrape package has six functions suited for this purpose: 
+
+  * etsyURL()
+  * etsyXML()
+  * etsyItemResults()
+  * etsyItemLinks()
+  * etsyShopResults()
+  * etsyShopLocations()
+
+This document introduces you to etsyscrape’s basic set of tools and shows you how to apply them to scraped html data from Etsy.com search results. 
+
+## Scraping Etsy.com Search Results: etsyURL() and etsyXML()
+
+The etsyURL() and etsyXML() functions allow the user to scrape the results of an Etsy.com search.
+
+In the example image below, the shopper is searching Etsy.com for “Christmas socks”. 
+Etsy.com returns the following page to the shopper’s screen:
+
+<br>
+
+```{r, out.width = "1020px", echo=FALSE}
+knitr::include_graphics("ChristmasSocksSearch.png")
+```
+
+<br>
+
+### etsyURL()
+
+There is a unique URL associated with the above search results. 
+
+The etsyURL() function creates this URL without having to visit the Etsy website directly.
+
+<br>
+
+The etsyURL() function takes two arguments: the search string, and the desired ordering of the search results. The default order of the search results is by *relevancy*, with options for *newest*, *lowest price*, and *highest price* (see etsyURL() function documentation).
+
+By simply entering the search string in the etsyURL() function, the corresponding URL is returned (with results ordered by most relevant).
+
+<br>
+
+In this "Christmas socks" example, the URL for the "Christmas socks" search is stored in the variable *socks_url*. 
+
+The etsyscrape package is first loaded, the etsyURL() function creates the URL, and the print() statement allows us to view the result. 
+
+<br>
+
+
+```{r}
+library(etsyscrape)
+
+socks_url <- etsyURL("Christmas socks")
+print(socks_url)
+```
+
+### etsyXML()
+
+The etsyXML() function scrapes the html of the Etsy.com search results, using a provided URL.
+
+In this example, the URL created by the “Christmas socks” Etsy.com search (*socks_url*) is used. 
+
+The HTML obtained from scraping the URL is then stored in the variable *xml_results* as an XML document.
+
+```{r}
+xml_results <- etsyXML(socks_url)
+print(xml_results)
+```
+
+## Extracting information from XML: etsyItem\*() and etsyShop\*() functions
+
+The remaining functions allow the user to extract information from the scraped Etsy.com search results. 
+
+### etsyItemResults()
+
+The etsyItemResults() function provides the names of the items returned by an Etsy.com search. The function takes one argument: the scraped XML.
+
+<br>
+
+Following with the "Christmas socks" example, the item names are highlighted in the image:
+
+```{r, out.width = "1020px", echo=FALSE}
+knitr::include_graphics("ChristmasSocksItems.png")
+```
+
+<br>
+
+The code below saves the character vector outputted by etsyItemResults() as *item_names*. Each element of the vector represents the name of one item. 
+
+The head() function is used to display the first six items of the vector. 
+
+*Note: The items in the vector do not always appear in the same order as they are displayed on-screen.*
+
+```{r}
+item_names <- etsyItemResults(xml_results)
+head(item_names)
+```
+
+### etsyItemLinks()
+
+The etsyItemLinks() function obtains the URL link to each unique item returned by an Etsy.com search. The function takes one argument: the scraped XML.
+
+```{r}
+item_links <- etsyItemLinks(xml_results)
+head(item_links)
+```
+
+The first link in these results brings us to the individual item's Etsy page, as shown below. 
+
+```{r, out.width = "1020px", echo=FALSE}
+knitr::include_graphics("ChristmasSocksItem1.png")
+knitr::include_graphics("ChristmasSocksItem1Page.png")
+```
+
+
+### etsyShopResults()
+
+The etsyShopResults() function provides the names of the shops selling items returned by an Etsy.com search. The function takes one argument: the scraped XML.
+
+<br>
+
+Following with the "Christmas socks" example, the shop names are highlighted in the image:
+
+```{r, out.width = "1020px", echo=FALSE}
+knitr::include_graphics("ChristmasSocksShops.png")
+```
+
+<br>
+
+The code below saves the character vector outputted by etsyShopResults() as *shop_names*. Each element of the vector represents the name of one shop. 
+
+The head() function is used to display the first six shops of the vector. 
+
+*Note: The items in the vector do not always appear in the same order as they are displayed on-screen. The shop names therefore may not be in order of appearance.*
+
+```{r}
+shop_names <- etsyShopResults(xml_results)
+head(shop_names)
+```
+
+### etsyShopLocations()
+
+The etsyShopLocations() function provides the location of each shop selling an item returned by an Etsy.com search. The function takes one argument: the scraped XML.
+
+The function scrapes the location of the Etsy shop from the shop's homepage.
+
+For the first item returned by our "Christmas socks" search, the shop selling the item is "PetPartyCo". Visiting the shop's webpage displays the screen below: 
+
+```{r, out.width = "1020px", echo=FALSE}
+knitr::include_graphics("ChristmasSocksItem1Shop.png")
+```
+
+<br>
+
+The location obtained by the function is the location shown on the shop's webpage. 
+
+The function returns a vector of shop names corresponding to the returned items. Each element of the vector represents the location of one shop. 
+
+```{r}
+shop_locations <- etsyShopLocations(xml_results)
+head(shop_locations)
+```
+
+
