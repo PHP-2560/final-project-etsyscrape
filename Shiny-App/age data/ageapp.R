@@ -1,3 +1,6 @@
+
+# calculate age based on input birthdate
+
 ui <- shinyUI(
   fluidPage({
     column(2, actionButton("Calculate", "Click to calculate age"),
