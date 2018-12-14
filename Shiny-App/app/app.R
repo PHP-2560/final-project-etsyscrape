@@ -17,8 +17,7 @@ ui <- navbarPage(strong("TravelBeeR"),
                         dateInput("birthdate", "Enter your date of birth (yyyy-mm-dd): ")
                       ),
                       mainPanel(
-                        plotOutput("plot"),
-                        tableOutput("table")
+                        leafletOutput("relevant_countries")
                       )
                     )
            ),
