@@ -9,13 +9,14 @@ knitr::opts_chunk$set(echo = TRUE)
 age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table_unclean_latlong.rds")
 
 # delete first row of data as it is a duplicate of column names
-age <- age[-1,]
+age <- age[-1,-c(4,5)]
 
 # within each column, remove *
 age$`on premise` <- gsub("[*]", "", age$`on premise`)
 age$`off premise` <- gsub("[*]", "", age$`off premise`)
 
 clean_age <- as.data.frame(age)
+clean_age_for_app <- saveRDS("clean_age", "C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/clean_age_for_app.rds")
 
 # separate clean_age into 3 datasets
 library(dplyr)
