@@ -25,6 +25,15 @@ age <- age[-1,]
 age$`On Premise` <- gsub("[*]", "", age$`On Premise`)
 age$`Off Premise` <- gsub("[*]", "", age$`Off Premise`)
 
+age$Country <- as.character(age$Country)
+age <- as.data.frame(age)
+
+# add lat long data to each country
+install.packages("ggmap")
+library(ggmap)
+
+countrylatlon <- as.data.frame(geocode(age$Country, output = "latlon", source = "dsk"))
+
 min_age_table_clean <- saveRDS("age", "C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table_clean.rds")
 ```
 
@@ -34,8 +43,16 @@ min_age_table_clean <- saveRDS("age", "C:/Users/akosu/Desktop/final-project-etsy
 install.packages("leaflet")
 library(leaflet)
 
-age_map <- leaflet() %>%
-  addTiles() 
+leaflet() %>%
+  addTiles() %>%
+  addProviderTiles("CartoDB")
+
+
+
+age$Country %>%
+  leaflet() %>%
+  addTiles %>%
+  addPolygons()
 
 ```
 
@@ -53,5 +70,3 @@ ui <- navbarPage(strong("TravelBeeR"),
                       )
                     )
            ),
-```
-
