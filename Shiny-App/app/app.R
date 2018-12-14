@@ -3,7 +3,7 @@ library(dplyr)
 library(markdown)
 library(leaflet)
 
-#complete_data <- readRDS("beer data/beer_complete_data.rds")
+complete_data <- readRDS("beer data/beer_complete_data.rds")
 complete_data$UT_sub_style <- as.character(complete_data$UT_sub_style)
 complete_data$large_style <- as.character(complete_data$large_style)
 
@@ -17,8 +17,7 @@ ui <- navbarPage(strong("TravelBeeR"),
                         dateInput("birthdate", "Enter your date of birth (yyyy-mm-dd): ")
                       ),
                       mainPanel(
-                        plotOutput("plot"),
-                        tableOutput("table")
+                        leafletOutput("relevant_countries")
                       )
                     )
            ),
