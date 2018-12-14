@@ -3,7 +3,7 @@ library(stringr)
 library(miceadds)
 
 # Import data from beer_ratings source
-data <- load.Rdata2("original_beer_ratings_data.RData", path=getwd())
+data <- load.Rdata2("beer data/original_beer_ratings_data.RData", path=getwd())
 
 # Convert location column into character string
 data$UT_loc <- as.character(data$UT_loc)
@@ -69,6 +69,6 @@ data_unfinished <- data_unfinished %>%
          UT_ABV, BA_ABV, UT_IBU, UT_rating, UT_raters, BA_rating, BA_raters, UT_loc, city, state, country)
 
 data_clean <- rbind(data_USA, data_Canada, data_unfinished)
-data_clean$city <- gsub("[^[:alpha:]]", "", data_clean$city)
+data_clean$city <- gsub("[^[:alpha:]]", " ", data_clean$city)
 
 saveRDS(data_clean, file = "beer_data_citycountry.rds")

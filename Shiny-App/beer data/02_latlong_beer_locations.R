@@ -19,6 +19,8 @@ library(ggmap)
 
 # Create a variable containing the entire location - the brewery name and location
 # from original data frame
+
+beer_data_clean <- readRDS("beer_data_citycountry.rds")
 beer_data_clean <- beer_data_clean %>%
   mutate(location_string = paste(UT_brewery, UT_loc, sep=" "))
 
