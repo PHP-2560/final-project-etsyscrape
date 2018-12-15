@@ -28,6 +28,11 @@ pal <- colorNumeric(palette = "YlOrRd", domain = c(0:5))
 
 ui <- navbarPage(strong("TravelBeeR"),
                  tabPanel("Legal Drinking Age",
+                          sidebarLayout(
+                            sidebarPanel(
+                              htmlOutput("premise_definition")
+                            ),
+                          
                           mainPanel(
                             tabsetPanel(
                               tabPanel(
@@ -44,6 +49,7 @@ ui <- navbarPage(strong("TravelBeeR"),
                                 title = "Restrictions",
                                 htmlOutput("restricted"),
                                 dataTableOutput("age_restricted")
+                              )
                               )))),
                  tabPanel("Beer Map",
                           sidebarLayout(
@@ -85,7 +91,16 @@ ui <- navbarPage(strong("TravelBeeR"),
                           )))
 
 
+
 server <- function(input, output) {
+  output$premise_definition <- renderUI({
+    HTML(paste("", "On-premise consumption (restaurant, bar, etc.) means that the beverage
+               is consumed at the same establishment at which it was purchased.",
+               "", "Off premise refers to an establishment that sells alcohol which is 
+               meant to be consumed off site. For example, liquor stores and in some cases, grocery stores.",
+               "", "", sep = "<br/>"))
+  })
+  
   output$age_directions <- renderUI({
     HTML(paste("", "Search by country or age", 
                "", "", sep = "<br/>"))
