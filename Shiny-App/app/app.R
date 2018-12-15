@@ -4,9 +4,9 @@ library(markdown)
 library(leaflet)
 
 # load applicable age data table 
-clean_age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/clean_age_app_tables.rds")
+clean_age <- readRDS("age_data/clean_age_app_tables.rds")
 
-complete_data <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/beer data/beer_complete_data.rds")
+complete_data <- readRDS("beer_data/beer_complete_data.rds")
 complete_data$UT_sub_style <- as.character(complete_data$UT_sub_style)
 complete_data$large_style <- as.character(complete_data$large_style)
 
