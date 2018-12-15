@@ -3,7 +3,10 @@ library(dplyr)
 library(markdown)
 library(leaflet)
 
-complete_data <- readRDS("beer data/beer_complete_data.rds")
+# load applicable age data table 
+clean_age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/clean_age_app_tables.rds")
+
+complete_data <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/beer data/beer_complete_data.rds")
 complete_data$UT_sub_style <- as.character(complete_data$UT_sub_style)
 complete_data$large_style <- as.character(complete_data$large_style)
 
@@ -11,55 +14,108 @@ pal <- colorNumeric(palette = "YlOrRd", domain = c(0:5))
 
 
 ui <- navbarPage(strong("TravelBeeR"),
-           tabPanel("Legal Drinking Age",
-                    sidebarLayout(
-                      sidebarPanel(
-                        dateInput("birthdate", "Enter your date of birth (yyyy-mm-dd): ")
-                      ),
-                      mainPanel(
-                        leafletOutput("relevant_countries")
-                      )
-                    )
-           ),
-           tabPanel("Beer Map",
-                    sidebarLayout(
-                      sidebarPanel(
-                        uiOutput("styleOutput_1"),
-                        radioButtons("pointDisplay", "Show results as: ", 
-                                     c("Points", "Clusters"), selected = "Clusters")
-                      ),
-                      mainPanel(
-                          leafletOutput("selected_map"))
-                        )),
-           tabPanel("Top Destinations",
-                    sidebarLayout(
-                      sidebarPanel(
-                        uiOutput("styleOutput_2")
-                      ),
-                      mainPanel(
-                        tabsetPanel(
-                          tabPanel(
-                            title = "Unique Beers by City", 
-                            dataTableOutput("beer_unique_city")
-                          ),
-                          tabPanel(
-                            title = "Unique Beers by Country",
-                            dataTableOutput("beer_unique_country")
-                          ),
-                          tabPanel(
-                            title = "Average Rating by City",
-                            dataTableOutput("beer_avgrating_city")
-                          ),
-                          tabPanel(
-                            title = "Average Rating by Country",
-                            dataTableOutput("beer_avgrating_country")
+                 tabPanel("Legal Drinking Age",
+                          sidebarLayout(
+                            sidebarPanel(
+                              htmlOutput("premise_definition")
+                            ),
+                          
+                          mainPanel(
+                            tabsetPanel(
+                              tabPanel(
+                                title = "All Countries",
+                                htmlOutput("age_directions"), 
+                                dataTableOutput("clean_age")
+                              ),
+                              tabPanel(
+                                title = "No Minimum Age",
+                                htmlOutput("none"),
+                                dataTableOutput("no_age")
+                              ),
+                              tabPanel(
+                                title = "Restrictions",
+                                htmlOutput("restricted"),
+                                dataTableOutput("age_restricted")
+                              )
+                              )))),
+                 tabPanel("Beer Map",
+                          sidebarLayout(
+                            sidebarPanel(
+                              uiOutput("styleOutput_1"),
+                              radioButtons("pointDisplay", "Show results as: ", 
+                                           c("Points", "Clusters"), selected = "Clusters")
+                            ),
+                            mainPanel(
+                              htmlOutput("beer_directions"),
+                              leafletOutput("selected_map"))
+                          )),
+                 tabPanel("Top Destinations",
+                          sidebarLayout(
+                            sidebarPanel(
+                              uiOutput("styleOutput_2"),
+                              htmlOutput("destination_description")
+                            ),
+                            mainPanel(
+                              tabsetPanel(
+                                tabPanel(
+                                  title = "Unique Beers by City", 
+                                  dataTableOutput("beer_unique_city")
+                                ),
+                                tabPanel(
+                                  title = "Unique Beers by Country",
+                                  dataTableOutput("beer_unique_country")
+                                ),
+                                tabPanel(
+                                  title = "Average Rating by City",
+                                  dataTableOutput("beer_avgrating_city")
+                                ),
+                                tabPanel(
+                                  title = "Average Rating by Country",
+                                  dataTableOutput("beer_avgrating_country")
+                                )
+                              )
+                            )
                           )
-                        )
-                      )
-                    )))
+                          )
+                 )
+
 
 
 server <- function(input, output) {
+  output$premise_definition <- renderUI({
+    HTML(paste("", "On-premise consumption (restaurant, bar, etc.) means that the beverage
+               is consumed at the same establishment at which it was purchased.",
+               "", "Off premise refers to an establishment that sells alcohol which is 
+               meant to be consumed off site. For example, liquor stores and in some cases, grocery stores.",
+               "", "", sep = "<br/>"))
+  })
+  
+  output$age_directions <- renderUI({
+    HTML(paste("", "Search by country or age", 
+               "", "", sep = "<br/>"))
+  })
+  output$none <- renderUI({
+    HTML(paste("", "There is no minimum drinking age in the below countries!", 
+               "", "", sep = "<br/>"))
+  })
+  output$restricted <- renderUI({
+    HTML(paste("", "Consumption of alcohol is prohibited or restricted in the below countries,", " dependent on province, religion, jurisdiction or type of beverage.",
+               "", "Search by key words: 'prohibited', 'restricted', 'religion', 'jurisdiction', 'beverage'", 
+               "", "", sep = "<br/>"))
+  })
+  
+  output$clean_age <- renderDataTable(clean_age)
+  
+  output$age_restricted <- renderDataTable(clean_age %>%
+                                             filter(clean_age[,2] %in% c("[all sale is prohibited]", "[varies by beverage and jurisdiction]", 
+                                                                         "[varies by beverage]", "[varies by jurisdiction and by beverage]", 
+                                                                         "[varies by jurisdiction]", "[varies by province]", 
+                                                                         "[varies by religion and jurisdiction]", "[varies by religion]")))
+  
+  output$no_age <- renderDataTable(clean_age %>%
+                                     select("Country") %>%                                     
+                                     filter(clean_age[,2] %in% c("[none]")))
+  
   filtered_map <- reactive({
     if (input$styleInput_1 == "-- ALL STYLES --") {
       return(complete_data)
@@ -203,17 +259,25 @@ server <- function(input, output) {
     )
   })
   
+  output$beer_directions <- renderUI({
+    HTML(paste("", "Select your perfered beer style.", 
+               "", "Choose results displayed as clusters or points.",
+               "", "Click on clusters to zoom in.", 
+               "", "Click on individual points to display additional information.",
+               "", "", sep = "<br/>"))
+  })
+  
   output$selected_map <- renderLeaflet({ 
     mapInput()
   })
-    
+  
   output$styleOutput_1 <- renderUI({
-      selectInput("styleInput_1", "Beer style:",
-                  c("-- ALL STYLES --", "ALL: Brown Ale", "ALL: IPA", "ALL: Lager", 
-                    "ALL: Pale Ale", "ALL: Pilsner", "ALL: Porter", "ALL: Sour",
-                    "ALL: Stout", "ALL: Red Ale", sort(unique(complete_data$UT_sub_style))),
-                  selected = "-- ALL STYLES --")
-    })
+    selectInput("styleInput_1", "Beer style:",
+                c("-- ALL STYLES --", "ALL: Brown Ale", "ALL: IPA", "ALL: Lager", 
+                  "ALL: Pale Ale", "ALL: Pilsner", "ALL: Porter", "ALL: Sour",
+                  "ALL: Stout", "ALL: Red Ale", sort(unique(complete_data$UT_sub_style))),
+                selected = "-- ALL STYLES --")
+  })
   
   output$styleOutput_2 <- renderUI({
     selectInput("styleInput_2", "Beer style:",
@@ -221,6 +285,14 @@ server <- function(input, output) {
                   "ALL: Pale Ale", "ALL: Pilsner", "ALL: Porter", "ALL: Sour",
                   "ALL: Stout", "ALL: Red Ale", sort(unique(complete_data$UT_sub_style))),
                 selected = "-- ALL STYLES --")
+  })
+  
+  output$destination_description <- renderUI({
+    HTML(paste("", "The 'Unique Beers by City' and 'Unique Beers by Country' tabs 
+               display the number of unique beers for each area, respectively.", 
+               "", "The 'Average Rating by City' and 'Average Rating by Country' tabs
+               display the average rating of beers for each area, respectively.",
+               "", "", sep = "<br/>"))
   })
   
   output$beer_unique_city <- renderDataTable({
@@ -294,10 +366,10 @@ server <- function(input, output) {
       colnames(table2) <- c("City", "Country", "Average Beer Rating")
       
     } else if (input$styleInput_2 == "ALL: Brown Ale" | input$styleInput_2 == "ALL: IPA"
-              | input$styleInput_2 =="ALL: Lager" | input$styleInput_2 == "ALL: Pale Ale"
-              | input$styleInput_2 =="ALL: Pilsner" | input$styleInput_2 =="ALL: Porter"
-              | input$styleInput_2 =="ALL: Sour" | input$styleInput_2 == "ALL: Stout"
-              | input$styleInput_2 =="ALL: Red Ale") {
+               | input$styleInput_2 =="ALL: Lager" | input$styleInput_2 == "ALL: Pale Ale"
+               | input$styleInput_2 =="ALL: Pilsner" | input$styleInput_2 =="ALL: Porter"
+               | input$styleInput_2 =="ALL: Sour" | input$styleInput_2 == "ALL: Stout"
+               | input$styleInput_2 =="ALL: Red Ale") {
       
       table2 <- filtered_dest() %>%
         group_by(large_style, city, country) %>%
