@@ -263,7 +263,7 @@ server <- function(input, output) {
   })
   # directions for Beer Map tab
   output$beer_directions <- renderUI({
-    HTML(paste("", "Select your perfered beer style.", 
+    HTML(paste("", "Select your preferred beer style.", 
                "", "Choose results displayed as clusters or points.",
                "", "Click on clusters to zoom in.", 
                "", "Click on individual points to display additional information.",
