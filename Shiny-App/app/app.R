@@ -14,30 +14,6 @@ pal <- colorNumeric(palette = "YlOrRd", domain = c(0:5))
 
 
 ui <- navbarPage(strong("TravelBeeR"),
-                 tabPanel("Legal Drinking Age",
-                          sidebarLayout(
-                            sidebarPanel(
-                              htmlOutput("premise_definition")
-                            ),
-                          
-                          mainPanel(
-                            tabsetPanel(
-                              tabPanel(
-                                title = "All Countries",
-                                htmlOutput("age_directions"), 
-                                dataTableOutput("clean_age")
-                              ),
-                              tabPanel(
-                                title = "No Minimum Age",
-                                htmlOutput("none"),
-                                dataTableOutput("no_age")
-                              ),
-                              tabPanel(
-                                title = "Restrictions",
-                                htmlOutput("restricted"),
-                                dataTableOutput("age_restricted")
-                              )
-                              )))),
                  tabPanel("Beer Map",
                           sidebarLayout(
                             sidebarPanel(
@@ -76,7 +52,31 @@ ui <- navbarPage(strong("TravelBeeR"),
                               )
                             )
                           )
-                          )
+                          ),
+                 tabPanel("Legal Drinking Age",
+                          sidebarLayout(
+                            sidebarPanel(
+                              htmlOutput("premise_definition")
+                            ),
+                            
+                            mainPanel(
+                              tabsetPanel(
+                                tabPanel(
+                                  title = "All Countries",
+                                  htmlOutput("age_directions"), 
+                                  dataTableOutput("clean_age")
+                                ),
+                                tabPanel(
+                                  title = "No Minimum Age",
+                                  htmlOutput("none"),
+                                  dataTableOutput("no_age")
+                                ),
+                                tabPanel(
+                                  title = "Restrictions",
+                                  htmlOutput("restricted"),
+                                  dataTableOutput("age_restricted")
+                                )
+                              ))))
                  )
 
 
