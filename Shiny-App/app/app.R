@@ -82,6 +82,7 @@ ui <- navbarPage(strong("TravelBeeR"),
 
 
 server <- function(input, output) {
+  # description for legal drinking age tab
   output$premise_definition <- renderUI({
     HTML(paste("", "On-premise consumption (restaurant, bar, etc.) means that the beverage
                is consumed at the same establishment at which it was purchased.",
@@ -89,29 +90,31 @@ server <- function(input, output) {
                meant to be consumed off site. For example, liquor stores and in some cases, grocery stores.",
                "", "", sep = "<br/>"))
   })
-  
+    # direction for all country tab
   output$age_directions <- renderUI({
     HTML(paste("", "Search by country or age", 
                "", "", sep = "<br/>"))
   })
+    # explanation of no age tab
   output$none <- renderUI({
     HTML(paste("", "There is no minimum drinking age in the below countries!", 
                "", "", sep = "<br/>"))
   })
+    # explanation of restriction tab
   output$restricted <- renderUI({
     HTML(paste("", "Consumption of alcohol is prohibited or restricted in the below countries,", " dependent on province, religion, jurisdiction or type of beverage.",
                "", "Search by key words: 'prohibited', 'restricted', 'religion', 'jurisdiction', 'beverage'", 
                "", "", sep = "<br/>"))
   })
-  
+    # data table for all country tab
   output$clean_age <- renderDataTable(clean_age)
-  
+    # data table for restriction tab
   output$age_restricted <- renderDataTable(clean_age %>%
                                              filter(clean_age[,2] %in% c("[all sale is prohibited]", "[varies by beverage and jurisdiction]", 
                                                                          "[varies by beverage]", "[varies by jurisdiction and by beverage]", 
                                                                          "[varies by jurisdiction]", "[varies by province]", 
                                                                          "[varies by religion and jurisdiction]", "[varies by religion]")))
-  
+    # data table for no age tab
   output$no_age <- renderDataTable(clean_age %>%
                                      select("Country") %>%                                     
                                      filter(clean_age[,2] %in% c("[none]")))
