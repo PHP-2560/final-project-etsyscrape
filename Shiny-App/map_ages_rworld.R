@@ -1,5 +1,6 @@
-library(rworldmap)
+
 install.packages("rworldmap")
+library(rworldmap)
 
 theCountries <- shp_countries$id
 # These are the ISO3 names of the countries you'd like to plot in red
