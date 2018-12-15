@@ -14,6 +14,10 @@ malMap <- joinCountryData2Map(malDF, joinCode = "ISO3",
 # This will join your malDF data.frame to the country map data
 
 mapCountryData(malMap, nameColumnToPlot="malaria", catMethod = "categorical",
-               missingCountryCol = gray(.8))
+               missingCountryCol = gray(.8), addLegend=FALSE )
 # And this will plot it, with the trick that the color palette's first
 # color is red
+
+do.call( addMapLegend, c(malMap, legendWidth=0.5, legendMar = 2))
+
+readRDS("beer_complete_data.rds")
