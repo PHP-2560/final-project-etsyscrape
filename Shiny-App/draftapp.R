@@ -32,7 +32,7 @@ ui <- navbarPage(strong("TravelBeeR"),
                             tabsetPanel(
                               tabPanel(
                                 title = "All Countries",
-                                htmlOutput("directions"), 
+                                htmlOutput("age_directions"), 
                                 dataTableOutput("clean_age")
                               ),
                               tabPanel(
@@ -53,12 +53,14 @@ ui <- navbarPage(strong("TravelBeeR"),
                                            c("Points", "Clusters"), selected = "Clusters")
                             ),
                             mainPanel(
+                              htmlOutput("beer_directions"),
                               leafletOutput("selected_map"))
                           )),
                  tabPanel("Top Destinations",
                           sidebarLayout(
                             sidebarPanel(
-                              uiOutput("styleOutput_2")
+                              uiOutput("styleOutput_2"),
+                              htmlOutput("destination_description")
                             ),
                             mainPanel(
                               tabsetPanel(
@@ -84,15 +86,18 @@ ui <- navbarPage(strong("TravelBeeR"),
 
 
 server <- function(input, output) {
-  output$directions <- renderUI({
-    HTML(paste("", "Search by country or age", sep = "<br/>"))
+  output$age_directions <- renderUI({
+    HTML(paste("", "Search by country or age", 
+               "", "", sep = "<br/>"))
   })
   output$none <- renderUI({
-    HTML(paste("", "There is no minimum drinking age in the below countries!", sep = "<br/>"))
+    HTML(paste("", "There is no minimum drinking age in the below countries!", 
+               "", "", sep = "<br/>"))
   })
   output$restricted <- renderUI({
     HTML(paste("", "Consumption of alcohol is prohibited or restricted in the below countries,", " dependent on province, religion, jurisdiction or type of beverage.",
-               "", "Search by key words: 'prohibited', 'restricted', 'religion', 'jurisdiction', 'beverage'", sep = "<br/>"))
+               "", "Search by key words: 'prohibited', 'restricted', 'religion', 'jurisdiction', 'beverage'", 
+               "", "", sep = "<br/>"))
   })
   
   output$clean_age <- renderDataTable(clean_age)
@@ -250,6 +255,14 @@ server <- function(input, output) {
     )
   })
   
+  output$beer_directions <- renderUI({
+    HTML(paste("", "Select your perfered beer style.", 
+               "", "Choose results displayed as clusters or points.",
+               "", "Click on clusters to zoom in.", 
+               "", "Click on individual points to display additional information.",
+               "", "", sep = "<br/>"))
+  })
+  
   output$selected_map <- renderLeaflet({ 
     mapInput()
   })
@@ -268,6 +281,14 @@ server <- function(input, output) {
                   "ALL: Pale Ale", "ALL: Pilsner", "ALL: Porter", "ALL: Sour",
                   "ALL: Stout", "ALL: Red Ale", sort(unique(complete_data$UT_sub_style))),
                 selected = "-- ALL STYLES --")
+  })
+  
+  output$destination_description <- renderUI({
+    HTML(paste("", "The 'Unique Beers by City' and 'Unique Beers by Country' tabs 
+               display the number of unique beers for each area, respectively.", 
+               "", "The 'Average Rating by City' and 'Average Rating by Country' tabs
+               display the average rating of beers for each area, respectively.",
+               "", "", sep = "<br/>"))
   })
   
   output$beer_unique_city <- renderDataTable({
