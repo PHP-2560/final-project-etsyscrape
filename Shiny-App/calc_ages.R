@@ -1,5 +1,7 @@
 library(dplyr)
 library(countrycode)
+library(RColorBrewer)
+
 colnames(min_age_table) <- c("country", "age", "offage")
 
 min_age_table$age <- as.numeric(gsub("[*]", "", min_age_table$age))
@@ -14,7 +16,23 @@ map <- joinCountryData2Map(age_tbl, joinCode = "ISO3", nameJoinColumn =
                     suggestForFailedCodes = FALSE, mapResolution = "coarse", 
                     projection = NA, verbose = FALSE)
 
-mapCountryData( map)
+
+
+mapParams <- mapCountryData(map, nameColumnToPlot = "age", addLegend = FALSE, 
+                            mapRegion = "world",
+                            catMethod = c(16:21), missingCountryCol="dark grey", 
+                            numCats = length(unique(map$age)), colourPalette = colourPalette, 
+                            mapTitle = "", borderCol = "black")
+
+colourPalette <- RColorBrewer::brewer.pal(5,"PuRd")
+
+
+
+do.call( addMapLegend, c(mapParams, legendLabels= "all", legendWidth=0.5, legendMar = 2))
+
 
 data(age_tbl)
-sPDF <- joinCountryData2Map(age_tbl, joinCode = "code", nameJoinColumn = "country")
+
+saveRDS(age_tbl, "age_tbl.rds")
+
+colourPalette <- brewer.pal(age_tbl$age, 'RdYlGn')
