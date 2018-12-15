@@ -3,7 +3,7 @@ library(stringr)
 library(miceadds)
 
 # Import data from beer_ratings source
-data <- load.Rdata2("beer data/original_beer_ratings_data.RData", path=getwd())
+data <- load.Rdata("beer_data/original_beer_ratings_data.RData")
 
 # Convert location column into character string
 data$UT_loc <- as.character(data$UT_loc)
