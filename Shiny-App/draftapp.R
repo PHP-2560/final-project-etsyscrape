@@ -3,21 +3,8 @@ library(dplyr)
 library(markdown)
 library(leaflet)
 
-# first clean age data
-age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table_unclean_latlong.rds")
-
-# delete first row of data as it is a duplicate of column names
-# also delete lat long data
-age <- age[-1,-c(4,5)]
-
-# rename variables
-colnames(age) <- c("Country", "On Premise", "Off Premise")
-
-# within each column, remove *
-age$`On Premise` <- gsub("[*]", "", age$`On Premise`)
-age$`Off Premise` <- gsub("[*]", "", age$`Off Premise`)
-
-clean_age <- as.data.frame(age)
+# load applicable age data table 
+clean_age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/clean_age_app_tables.rds")
 
 complete_data <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/beer data/beer_complete_data.rds")
 complete_data$UT_sub_style <- as.character(complete_data$UT_sub_style)
@@ -88,7 +75,9 @@ ui <- navbarPage(strong("TravelBeeR"),
                                 )
                               )
                             )
-                          )))
+                          )
+                          )
+                 )
 
 
 
