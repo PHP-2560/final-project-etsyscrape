@@ -1,0 +1,93 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# clean age data
+age <- readRDS("C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table_unclean_latlong.rds")
+
+# delete first row of data as it is a duplicate of column names
+age <- age[-1,-c(4,5)]
+
+# within each column, remove *
+age$`on premise` <- gsub("[*]", "", age$`on premise`)
+age$`off premise` <- gsub("[*]", "", age$`off premise`)
+
+clean_age <- as.data.frame(age)
+clean_age_for_app <- saveRDS("clean_age", "C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/clean_age_for_app.rds")
+
+# separate clean_age into 3 datasets
+library(dplyr)
+
+unique(clean_age$`on premise`)
+
+age_restricted <- clean_age %>%
+  select("country", "on premise", "off premise") %>%
+  filter(clean_age[,2] %in% c("[all sale is prohibited]", "[varies by beverage and jurisdiction]", "[varies by beverage]", "[varies by jurisdiction and by beverage]", "[varies by jurisdiction]", "[varies by province]", "[varies by religion and jurisdiction]", "[varies by religion]"))
+
+no_age <- clean_age %>%
+  select("country", "on premise", "off premise") %>%
+  filter(clean_age[,2] %in% c("[none]"))
+print(paste("In the following countries, there is no minimun drinking age:", c(no_age$country)))
+
+age_to_filter <- clean_age %>%
+  select("country", "on premise", "off premise") %>%
+  filter(!(clean_age[,2] %in% c("[all sale is prohibited]", "[varies by beverage and jurisdiction]", "[varies by beverage]", "[varies by jurisdiction and by beverage]", "[varies by jurisdiction]", "[varies by province]", "[varies by religion and jurisdiction]", "[varies by religion]", "[none]")))
+
+
+min_age_table_clean_latlong <- saveRDS("clean_age", "C:/Users/akosu/Desktop/final-project-etsyscrape/Shiny-App/age data/min_age_table_clean_latlong.rds")
+```
+
+
+
+```{r}
+install.packages("leaflet")
+library(leaflet)
+library(sp)
+
+library(dplyr)
+str(clean_age)
+str(wrld_simpl)
+
+head(wrld_simpl@data, 3)
+
+test <- wrld_simpl[,c(5,6,10,11)]
+mergetest <- merge(wrld_simpl, clean_age, by.x = "NAME", by.y = "country", all = T)
+
+newtest <- 
+
+lonlat <- cbind(clean_age$lon, clean_age$lat)
+Pl <- Polygon(lonlat)
+ID <- as.list(clean_age$country)
+Pls <- Polygons(list(Pl), "ID")
+SPls <- SpatialPolygons(list(Pls))
+df <- data.frame(value = 3, row.names = "ID")
+SPDF <- SpatialPolygonsDataFrame(SPls, df)
+
+SPDF %>%
+  leaflet() %>%
+  addProviderTiles("CartoDB") %>%
+  addPolygons()
+
+test %>%
+  leaflet() %>%
+  addPolygons()
+
+#supposed to work for leaflet
+ filteredAge <- reactive({min_age_table_clean_latlong %>%
+    filter("'on premise" | "'off premise" >= "age")})
+  
+  filteredAgeMap <- reactive({
+    filteredAge() %>%
+      leaflet() %>%
+      addProviderTiles("CartoDB") %>%
+      addPolygons()
+  })
+  
+  # display map
+  output$filteredAgeMap <- renderLeaflet({ 
+   filteredAge()
+  })
+```
