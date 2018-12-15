@@ -54,8 +54,10 @@ data_unfinished$country <- str_replace(data_unfinished$country, "Africa", "South
 data_unfinished$city <- str_split(data_unfinished$UT_loc, ",")
 data_unfinished$city <- lapply(data_unfinished$city,"[", 1)
 
+# Everything that is not Canada or USA will have NA as the state value
 data_unfinished$state <- NA
 
+# Refine the data to the columns of interest (or potential interest)
 data_USA <- data_USA %>%
   select(BA_super_style, UT_sub_style, BA_sub_style, UT_beer_name, UT_brewery, BA_beer_name, BA_brewery,
 UT_ABV, BA_ABV, UT_IBU, UT_rating, UT_raters, BA_rating, BA_raters, UT_loc, city, state, country)
@@ -68,7 +70,11 @@ data_unfinished <- data_unfinished %>%
   select(BA_super_style, UT_sub_style, BA_sub_style, UT_beer_name, UT_brewery, BA_beer_name, BA_brewery,
          UT_ABV, BA_ABV, UT_IBU, UT_rating, UT_raters, BA_rating, BA_raters, UT_loc, city, state, country)
 
+# Combine all of the refined data frames to create one cleaned data set
 data_clean <- rbind(data_USA, data_Canada, data_unfinished)
+
+# Remove any unwanted characters from the city names
 data_clean$city <- gsub("[^[:alpha:]]", " ", data_clean$city)
 
+# Save the cleaned data with city and country info
 saveRDS(data_clean, file = "beer_data_citycountry.rds")
