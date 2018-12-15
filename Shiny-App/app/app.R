@@ -118,7 +118,7 @@ server <- function(input, output) {
   output$no_age <- renderDataTable(clean_age %>%
                                      select("Country") %>%                                     
                                      filter(clean_age[,2] %in% c("[none]")))
-  
+  # table for Beer map tab and selected input from drop down menu
   filtered_map <- reactive({
     if (input$styleInput_1 == "-- ALL STYLES --") {
       return(complete_data)
@@ -165,7 +165,7 @@ server <- function(input, output) {
                filter(UT_sub_style == input$styleInput_1))
     }
   })
-  
+  # table for Top Destinations tab and selected input from drop down menu
   filtered_dest <- reactive({
     if (input$styleInput_2 == "-- ALL STYLES --") {
       return(complete_data)
@@ -212,7 +212,7 @@ server <- function(input, output) {
                filter(UT_sub_style == input$styleInput_2))
     }
   })
-  
+    # beer map when clusters selected
   mapClusters <- reactive({
     filtered_map() %>%
       leaflet(options = leafletOptions(minZoom = 1, dragging = TRUE)) %>%
@@ -233,7 +233,7 @@ server <- function(input, output) {
                 position = "bottomleft",
                 bins = 5)
   })
-  
+    # beer map when points selected
   mapPoints <- reactive({
     filtered_map() %>%
       leaflet(options = leafletOptions(minZoom = 1, dragging = TRUE)) %>%
@@ -261,7 +261,7 @@ server <- function(input, output) {
            "Clusters" = mapClusters()
     )
   })
-  
+  # directions for Beer Map tab
   output$beer_directions <- renderUI({
     HTML(paste("", "Select your perfered beer style.", 
                "", "Choose results displayed as clusters or points.",
@@ -269,11 +269,11 @@ server <- function(input, output) {
                "", "Click on individual points to display additional information.",
                "", "", sep = "<br/>"))
   })
-  
+  # output map
   output$selected_map <- renderLeaflet({ 
     mapInput()
   })
-  
+  # dropdown list for Beer Map tab
   output$styleOutput_1 <- renderUI({
     selectInput("styleInput_1", "Beer style:",
                 c("-- ALL STYLES --", "ALL: Brown Ale", "ALL: IPA", "ALL: Lager", 
@@ -281,7 +281,7 @@ server <- function(input, output) {
                   "ALL: Stout", "ALL: Red Ale", sort(unique(complete_data$UT_sub_style))),
                 selected = "-- ALL STYLES --")
   })
-  
+  # dropdown list for Top Destinations tab
   output$styleOutput_2 <- renderUI({
     selectInput("styleInput_2", "Beer style:",
                 c("-- ALL STYLES --", "ALL: Brown Ale", "ALL: IPA", "ALL: Lager", 
@@ -289,7 +289,7 @@ server <- function(input, output) {
                   "ALL: Stout", "ALL: Red Ale", sort(unique(complete_data$UT_sub_style))),
                 selected = "-- ALL STYLES --")
   })
-  
+  # description for Top Destinations tab
   output$destination_description <- renderUI({
     HTML(paste("", "The 'Unique Beers by City' and 'Unique Beers by Country' tabs 
                display the number of unique beers for each area, respectively.", 
@@ -297,7 +297,7 @@ server <- function(input, output) {
                display the average rating of beers for each area, respectively.",
                "", "", sep = "<br/>"))
   })
-  
+  # table of unique beers by city
   output$beer_unique_city <- renderDataTable({
     if (input$styleInput_2 == "-- ALL STYLES --") {
       table <- filtered_dest() %>%
@@ -327,7 +327,7 @@ server <- function(input, output) {
     }
     table
   })
-  
+  # table of unique beers by country
   output$beer_unique_country <- renderDataTable({
     if (input$styleInput_2 == "-- ALL STYLES --") {
       table <- filtered_dest() %>%
@@ -358,7 +358,7 @@ server <- function(input, output) {
     }
     table
   })
-  
+  # table of average beer rating by city
   output$beer_avgrating_city <- renderDataTable({
     if (input$styleInput_2 == "-- ALL STYLES --") {
       table2 <- filtered_dest() %>%
@@ -391,7 +391,7 @@ server <- function(input, output) {
     }
     table2
   })
-  
+  # table of average beer rating by country
   output$beer_avgrating_country <- renderDataTable({
     if (input$styleInput_2 == "-- ALL STYLES --") {
       table2 <- filtered_dest() %>%
