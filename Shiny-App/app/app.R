@@ -2,6 +2,8 @@ library(shiny)
 library(dplyr)
 library(markdown)
 library(leaflet)
+library(RColorBrewer)
+library(rworldmap)
 
 # load applicable age data table 
 clean_age <- readRDS("age_data/clean_age_app_tables.rds")
@@ -12,6 +14,10 @@ complete_data$large_style <- as.character(complete_data$large_style)
 
 pal <- colorNumeric(palette = "YlOrRd", domain = c(0:5))
 
+colourPalette <- brewer.pal(6,"PuRd")
+
+# Making the map using the age_tbl data, read in
+age_tbl <- readRDS("age_data/age_tbl.rds")
 
 ui <- navbarPage(strong("TravelBeeR"),
                  tabPanel("Beer Map",
@@ -77,6 +83,11 @@ ui <- navbarPage(strong("TravelBeeR"),
                                   title = "Restrictions",
                                   htmlOutput("restricted"),
                                   dataTableOutput("age_restricted")
+                                ),
+                                tabPanel(
+                                  title = "Age Map",
+                                  htmlOutput("age_map_descr"),
+                                  imageOutput("age_map")
                                 )
                               ))))
                  )
@@ -86,27 +97,33 @@ ui <- navbarPage(strong("TravelBeeR"),
 server <- function(input, output) {
   # description for legal drinking age tab
   output$premise_definition <- renderUI({
-    HTML(paste("", "On-premise consumption (restaurant, bar, etc.) means that the beverage
-               is consumed at the same establishment at which it was purchased.",
-               "", "Off premise refers to an establishment that sells alcohol which is 
-               meant to be consumed off site. For example, liquor stores and in some cases, grocery stores.",
+    HTML(paste("", "Use the tables provided to explore the legal drinking age in 180 countries worldwide!",
+"", "On-premise age refers to the drinking age required to purchase alcohol and
+consume it on-site at the establishment of purchase (e.g. restaurants and pubs)",
+               "", "Off-premise age refers to the age required to purchase alcohol at an establishment selling
+               for off-site consumption (e.g. liquor stores).",
                "", "", sep = "<br/>"))
   })
-    # direction for all country tab
+  # direction for all country tab
   output$age_directions <- renderUI({
-    HTML(paste("", "Search by country or age", 
+    HTML(paste("", strong("Use the search box to the right to search by age or country."), 
                "", "", sep = "<br/>"))
   })
     # explanation of no age tab
   output$none <- renderUI({
-    HTML(paste("", "There is no minimum drinking age in the below countries!", 
+    HTML(paste("", strong("There is no minimum drinking age in these countries!"), 
                "", "", sep = "<br/>"))
   })
     # explanation of restriction tab
   output$restricted <- renderUI({
-    HTML(paste("", "Consumption of alcohol is prohibited or restricted in the below countries,", " dependent on province, religion, jurisdiction or type of beverage.",
-               "", "Search by key words: 'prohibited', 'restricted', 'religion', 'jurisdiction', 'beverage'", 
+    HTML(paste("", strong("Consumption of alcohol is restricted or varies geographically in the following countries."), 
+               "The drinking laws in these places may be dependent on province, religion, jurisdiction or type of beverage.",
+               "", "Helpful key search terms include: 'prohibited', 'restricted', 'religion', 'jurisdiction', 'beverage'", 
                "", "", sep = "<br/>"))
+  })
+  
+  output$age_map_descr <- renderUI({
+    HTML(paste("", strong("Countries on the map are coloured by on-premise legal drinking age."), sep = "<br/>"))
   })
     # data table for all country tab
   output$clean_age <- renderDataTable(clean_age)
@@ -337,6 +354,41 @@ server <- function(input, output) {
     }
     table
   })
+  
+  output$age_map <- renderImage({
+    # Initiating process to write map to file
+    png(filename="age_map.png")
+    
+    # Map object is created from the age_tbl, recognizes the countries by the code column,
+    # because they are identified as "ISO3".
+    map <- joinCountryData2Map(age_tbl, joinCode = "ISO3", nameJoinColumn =
+                                 "code", nameCountryColumn = "country", 
+                               suggestForFailedCodes = FALSE, mapResolution = "coarse", 
+                               projection = NA, verbose = FALSE)
+    
+    # Specify the parameters for creating the map - using the age column as the plotting 
+    # variable, the entire world as the region, with NA age countries coloured dark grey
+    mapParams <- mapCountryData(map, nameColumnToPlot = "age", addLegend = FALSE, 
+                                mapRegion = "world",
+                                catMethod = c(16:21), missingCountryCol="dark grey", 
+                                numCats = length(unique(map$age)), colourPalette = colourPalette, 
+                                mapTitle = "", borderCol = "black")
+    
+    # Add a custom legend to the map
+    do.call(addMapLegend, c(mapParams, legendLabels= "all", legendWidth=0.5,
+                            legendMar = 2))
+    
+    # Writing plot output to file
+    dev.off()
+      
+      # Return a list containing the filename
+    list(src = "age_map.png",
+           contentType = 'image/png',
+           width = 700,
+           height = 700,
+           alt = "This is alternate text")
+  })
+  
   # table of unique beers by country
   output$beer_unique_country <- renderDataTable({
     if (input$styleInput_2 == "-- ALL STYLES --") {
