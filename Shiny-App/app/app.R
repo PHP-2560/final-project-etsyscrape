@@ -17,19 +17,21 @@ ui <- navbarPage(strong("TravelBeeR"),
                  tabPanel("Beer Map",
                           sidebarLayout(
                             sidebarPanel(
+                              htmlOutput("beer_directions"),
                               uiOutput("styleOutput_1"),
                               radioButtons("pointDisplay", "Show results as: ", 
-                                           c("Points", "Clusters"), selected = "Clusters")
-                            ),
+                                           c("Points", "Clusters"), selected = "Clusters"),
+                              htmlOutput("beer_directions_2")
+                              ),
                             mainPanel(
-                              htmlOutput("beer_directions"),
                               leafletOutput("selected_map"))
                           )),
                  tabPanel("Top Destinations",
                           sidebarLayout(
                             sidebarPanel(
+                              htmlOutput("destination_description"),
                               uiOutput("styleOutput_2"),
-                              htmlOutput("destination_description")
+                              htmlOutput("destination_description_2")
                             ),
                             mainPanel(
                               tabsetPanel(
@@ -263,11 +265,15 @@ server <- function(input, output) {
   })
   # directions for Beer Map tab
   output$beer_directions <- renderUI({
-    HTML(paste("", "Select your preferred beer style.", 
-               "", "Choose results displayed as clusters or points.",
-               "", "Click on clusters to zoom in.", 
-               "", "Click on individual points to display additional information.",
+    HTML(paste("", "Select your favourite style of beer to see all beers of that type displayed on the map! 
+               The results can be displayed by geographical clusters or individual points.",
                "", "", sep = "<br/>"))
+  })
+  
+  output$beer_directions_2 <- renderUI({
+    HTML(paste("", "Click on clusters to zoom in, and click on individual points to 
+               see the name of the beer, its style, its brewery, and its Untappd rating!",
+               "", sep = "<br/>"))
   })
   # output map
   output$selected_map <- renderLeaflet({ 
@@ -291,10 +297,14 @@ server <- function(input, output) {
   })
   # description for Top Destinations tab
   output$destination_description <- renderUI({
-    HTML(paste("", "The 'Unique Beers by City' and 'Unique Beers by Country' tabs 
-               display the number of unique beers for each area, respectively.", 
-               "", "The 'Average Rating by City' and 'Average Rating by Country' tabs
-               display the average rating of beers for each area, respectively.",
+    HTML(paste("", "The tabs and tables to the right filter based on the selected beer style.", 
+               "", "", sep = "<br/>"))
+  })
+  
+  output$destination_description_2 <- renderUI({
+    HTML(paste("", "The 'Unique Beers' tabs display the number of unique beers in each specific city
+               or country, and the 'Average Rating' tabs display the average Untappd rating of beers from
+               each location.",
                "", "", sep = "<br/>"))
   })
   # table of unique beers by city
